@@ -1,10 +1,10 @@
-name: Run Stocks Script and Push Changes
+name: Run Stocks Script and push Changes
 
 on:
   schedule:
     # Runs daily at 10:00 AM UTC
     - cron: '0 10 * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual trigger of the workflow
 
 permissions:
   contents: write # Grant write permissions to push changes
@@ -18,7 +18,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        persist-credentials: true # Ensures credentials are available for pushing changes
+        persist-credentials: true # Ensures credentials are available for pushing changes.
 
     # Step 2: Set up Python
     - name: Set up Python
@@ -26,22 +26,28 @@ jobs:
       with:
         python-version: '3.x'
 
-    # Step 3: Install dependencies
+    # Step 3: Install dependencies (if you have any)
     - name: Install dependencies
-      run: pip install -r requirements.txt
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt  # Install dependencies if a requirements.txt exists
+        fi
+        python stocks.py  # Run the Python script
 
-    # Step 4: Run the script
-    - name: Run stocks.py script
-      run: python stocks.py
-
-    # Step 5: Commit and push changes back to the repository
+    # Step 4: Commit and push changes if there are any
     - name: Commit and push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically provided by GitHub Actions
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add .
-        git commit -m "Automated changes by stocks.py script" || echo "No changes to commit"
-        git push origin main
         
+        # Stage all changes
+        git add .
+
+        # Commit changes if any changes exist
+        git commit -m "Automated changes by stocks.py script" || echo "No changes to commit"
+
+        # Only push if there were changes committed
+        git push origin main || echo "No changes to push"
+
