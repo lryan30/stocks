@@ -30,9 +30,9 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-     # Run the Python script
+     # Run the script
     - name: Run weather.sh script
-      run: python weather.sh
+      run: bash weather.sh
       
     # Step 4: Commit and push changes if there are any
     - name: Commit and push changes
