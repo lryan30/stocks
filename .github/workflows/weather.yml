@@ -1,16 +1,16 @@
-name: Run Stocks Script and push Changes
+name: Weather Data
 
 on:
   schedule:
-    # Runs daily at 10:00 AM UTC
     - cron: '0 10 * * *'
-  workflow_dispatch:  # Allows manual trigger of the workflow
+  workflow_dispatch:
+
 
 permissions:
   contents: write # Grant write permissions to push changes
 
 jobs:
-  run-stocks:
+  run-weather:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,14 +26,14 @@ jobs:
       with:
         python-version: '3.x'
 
-    # Step 3: Install dependencies (if you have any)
+    # Step 3: Install dependencies 
     - name: Install dependencies
-      run: |
-        if [ -f requirements.txt ]; then
-          pip install -r requirements.txt  # Install dependencies if a requirements.txt exists
-        fi
-        python stocks.py  # Run the Python script
+      run: pip install -r requirements.txt
 
+     # Run the Python script
+    - name: Run weather.sh script
+      run: python weather.sh
+      
     # Step 4: Commit and push changes if there are any
     - name: Commit and push changes
       env: 
@@ -41,13 +41,6 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        
-        # Stage all changes
         git add .
-
-        # Commit changes if any changes exist
-        git commit -m "Automated changes by stocks.py script" || echo "No changes to commit"
-
-        # Only push if there were changes committed
+        git commit -m "Automated changes by weather.sh script" || echo "No changes to commit"
         git push origin main || echo "No changes to push"
-
